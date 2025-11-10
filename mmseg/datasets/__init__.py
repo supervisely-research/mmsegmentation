@@ -28,6 +28,7 @@ from .stare import STAREDataset
 from .synapse import SynapseDataset
 from .tomato import TomatoDataset
 from .adaptive_tomato import AdaptiveTomatoDataset
+from .online_training_dataset import OnlineTrainingDataset
 # yapf: disable
 from .transforms import (CLAHE, AdjustGamma, Albu, BioMedical3DPad,
                          BioMedical3DRandomCrop, BioMedical3DRandomFlip,
@@ -63,5 +64,6 @@ __all__ = [
     'MapillaryDataset_v2', 'Albu', 'LEVIRCDDataset',
     'LoadMultipleRSImageFromFile', 'LoadSingleRSImageFromFile',
     'ConcatCDInput', 'BaseCDDataset', 'DSDLSegDataset', 'BDD100KDataset',
-    'NYUDataset', 'HSIDrive20Dataset', 'TomatoDataset', 'AdaptiveTomatoDataset'
+    'NYUDataset', 'HSIDrive20Dataset', 'TomatoDataset', 'AdaptiveTomatoDataset',
+    'OnlineTrainingDataset'
 ]
