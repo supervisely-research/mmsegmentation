@@ -29,6 +29,7 @@ from .synapse import SynapseDataset
 from .tomato import TomatoDataset
 from .adaptive_tomato import AdaptiveTomatoDataset
 from .online_training_dataset import OnlineTrainingDataset
+from .samplers import CustomSampler
 # yapf: disable
 from .transforms import (CLAHE, AdjustGamma, Albu, BioMedical3DPad,
                          BioMedical3DRandomCrop, BioMedical3DRandomFlip,
@@ -65,5 +66,5 @@ __all__ = [
     'LoadMultipleRSImageFromFile', 'LoadSingleRSImageFromFile',
     'ConcatCDInput', 'BaseCDDataset', 'DSDLSegDataset', 'BDD100KDataset',
     'NYUDataset', 'HSIDrive20Dataset', 'TomatoDataset', 'AdaptiveTomatoDataset',
-    'OnlineTrainingDataset'
+    'OnlineTrainingDataset', 'CustomSampler'
 ]

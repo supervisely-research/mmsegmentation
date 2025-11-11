@@ -20,6 +20,8 @@ from .typing_utils import (ConfigType, ForwardResults, MultiConfig,
                            OptConfigType, OptMultiConfig, OptSampleList,
                            SampleList, TensorDict, TensorList)
 
+from .dist_utils import (all_reduce_dict, allreduce_grads, reduce_mean,
+                         sync_random_seed)
 # isort: off
 from .mask_classification import MatchMasks, seg_data_to_instance_data
 
@@ -67,4 +69,8 @@ __all__ = [
     'MatchMasks',
     'bdd100k_classes',
     'bdd100k_palette',
+    'all_reduce_dict',
+    'allreduce_grads',
+    'reduce_mean',
+    'sync_random_seed'
 ]

@@ -25,11 +25,8 @@ test_pipeline = [
 ]
 
 data_root = '/root/data'
-train_img_path = 'images/train/images/training'
-train_seg_map_path = 'images/train/annotations/training'
-val_img_path='images/val/images/validation'
-val_seg_map_path='images/val/annotations/validation'
-
+train_dir = 'images/train'
+val_dir = 'images/val'
 
 classes = ['background', 'Core', 'Locule', 'Navel',
            'Pericarp', 'Placenta', 'Septum', 'Tomato']
@@ -61,8 +58,8 @@ train_dataloader = dict(
         data_root=data_root,
         metainfo=metainfo,
         data_prefix=dict(
-            img_path=train_img_path,
-            seg_map_path=train_seg_map_path
+            img_path='images/train/images/training',
+            seg_map_path='images/train/annotations/training'
         ),
         pipeline=train_pipeline,
         reduce_zero_label=False
