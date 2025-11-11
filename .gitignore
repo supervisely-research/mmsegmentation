@@ -115,6 +115,15 @@ data
 *.log.json
 work_dirs/
 mmseg/.mim
+*.gz
 
-# Pytorch
 *.pth
+*.png
+*.jpg
+*.JPG 
+*.jpeg
+*.ipynb_checkpoints
+*.ipynb
+*__pycache__
+
+projects/
