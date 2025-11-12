@@ -205,6 +205,7 @@ class OnlineTrainingAPISly(Hook):
                 f"Current iteration: {self.iter}, warmup required: {self._iters_to_warmup}. "
                 f"Predictions may be unreliable."
             )
+        image_np = np.array(request_data['image'])              
         orig_h, orig_w = image_np.shape[:2]
         scale = TARGET_HEIGHT / orig_h
         target_w = int(orig_w * scale)
