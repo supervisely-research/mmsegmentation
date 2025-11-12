@@ -20,6 +20,7 @@ from mmseg.online_training.inference_utils import get_test_pipeline, predictions
 import supervisely as sly
 from supervisely import logger
 
+TARGET_HEIGHT = 1024
 
 @HOOKS.register_module()
 class OnlineTrainingAPISly(Hook):
@@ -204,9 +205,14 @@ class OnlineTrainingAPISly(Hook):
                 f"Current iteration: {self.iter}, warmup required: {self._iters_to_warmup}. "
                 f"Predictions may be unreliable."
             )
+        orig_h, orig_w = image_np.shape[:2]
+        scale = TARGET_HEIGHT / orig_h
+        target_w = int(orig_w * scale)
+        
+        image_np_resized = cv2.resize(image_np, (target_w, TARGET_HEIGHT))
         
         image_np = np.array(request_data['image'])
-        original_shape = image_np.shape[:2]  # (height, width) ← ДОБАВЬ
+        original_shape = image_np.shape[:2] 
         
         model = runner.model
         model.cfg = runner.cfg
@@ -214,14 +220,14 @@ class OnlineTrainingAPISly(Hook):
         model.eval()
         
         try:
-            result = inference_model(model, image_np)
+            result = inference_model(model, image_np_resized)
             
             objects = predictions_to_sly_figures(
                 result,
                 self.score_thr,
                 self.idx2class,
                 self.obj_classes,
-                original_shape=original_shape  # ← ДОБАВЬ
+                original_shape=original_shape 
             )
             
             return {
@@ -244,7 +250,17 @@ class OnlineTrainingAPISly(Hook):
             raise ValueError(f"Image ID {img_id} already exists in dataset.")
         self.img_ids_set.add(img_id)
 
-        image = Image.fromarray(image_np).convert('RGB')
+        orig_h, orig_w = image_np.shape[:2]
+        scale = TARGET_HEIGHT / orig_h
+        target_w = int(orig_w * scale)
+
+        # Resize image
+        image_np_resized = cv2.resize(image_np, (target_w, TARGET_HEIGHT))
+    
+        # Save resized image
+        image = Image.fromarray(image_np_resized).convert('RGB')
+
+        # image = Image.fromarray(image_np).convert('RGB')
         image_path = self.images_dir / filename
         image.save(image_path)
         
