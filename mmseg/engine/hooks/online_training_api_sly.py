@@ -73,6 +73,8 @@ class OnlineTrainingAPISly(Hook):
         self.runner = runner
         self._model_loaded = True
         self.test_pipeline = get_test_pipeline(runner)
+        if not hasattr(runner.model, 'cfg'):
+            runner.model.cfg = runner.cfg
 
     @property
     def _dataset(self) -> OnlineTrainingDataset:
@@ -197,19 +199,31 @@ class OnlineTrainingAPISly(Hook):
     @torch.no_grad()
     def handle_predict(self, runner: Runner, request_data: dict) -> dict:
         if not self._ready_to_predict:
-            logger.warning("⚠️ Model is not warmed up yet. Predictions may be unreliable.")
-        image_np = np.array(request_data['image'])        
+            logger.warning(
+                f"⚠️ Model not ready for predictions yet. "
+                f"Current iteration: {self.iter}, warmup required: {self._iters_to_warmup}. "
+                f"Predictions may be unreliable."
+            )
+        
+        image_np = np.array(request_data['image'])
+        original_shape = image_np.shape[:2]  # (height, width) ← ДОБАВЬ
+        
         model = runner.model
+        model.cfg = runner.cfg
         was_training = model.training
         model.eval()
+        
         try:
-            result = inference_model(model, image_np, self.test_pipeline)
+            result = inference_model(model, image_np)
+            
             objects = predictions_to_sly_figures(
                 result,
                 self.score_thr,
                 self.idx2class,
-                self.obj_classes
+                self.obj_classes,
+                original_shape=original_shape  # ← ДОБАВЬ
             )
+            
             return {
                 'objects': objects,
                 'image_id': request_data['image_id'],
@@ -218,7 +232,7 @@ class OnlineTrainingAPISly(Hook):
         finally:
             if was_training:
                 model.train()
-
+                
     def handle_add_sample(self, runner: Runner, request_data: dict) -> dict:
         dataset: 'OnlineTrainingDataset' = self._dataset
         img_id = request_data['image_id']
@@ -236,7 +250,7 @@ class OnlineTrainingAPISly(Hook):
         
         width, height = image.size
         img_info = {
-            'file_name': filename,
+            'file_name': str(image_path.resolve()),
             'width': width,
             'height': height,
         }

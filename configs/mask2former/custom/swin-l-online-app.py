@@ -31,12 +31,11 @@ val_img_path='images/val/images/validation'
 val_seg_map_path='images/val/annotations/validation'
 
 
-classes = ['background', 'Core', 'Locule', 'Navel',
-           'Pericarp', 'Placenta', 'Septum', 'Tomato']
+classes = ['Background', 'Columella', 'Core', 'Locule', 'Navel', 'Pericarp', 'Placenta', 'Septum', 'Tomato', 'Sepal']
 num_classes = len(classes)
 metainfo = None
 
-data_preprocessor = dict(size=crop_size)
+data_preprocessor = dict()#size=crop_size)
 
 model = dict(
     data_preprocessor=data_preprocessor,
