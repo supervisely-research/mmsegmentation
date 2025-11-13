@@ -18,7 +18,7 @@ RESUME_FROM_CHECKPOINT = None
 API_HOST = "0.0.0.0"
 API_PORT = 8000
 INITIAL_SAMPLES = 2
-DEVELOP_AND_DEBUG = True
+DEVELOP_AND_DEBUG = False
 
 
 @CheckpointLoader.register_scheme(prefixes='', force=True)
