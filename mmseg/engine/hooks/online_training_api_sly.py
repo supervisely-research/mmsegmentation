@@ -261,7 +261,6 @@ class OnlineTrainingAPISly(Hook):
         }
 
         mask = sly_to_mask(ann, (width, height), self.class2idx)
-        mask = cv2.resize(mask, (target_w, TARGET_HEIGHT), interpolation=cv2.INTER_NEAREST)
         mask = validate_mask(mask, img_info, len(self.classes) + 1)
         
         mask_filename = Path(filename).stem + '.png'
