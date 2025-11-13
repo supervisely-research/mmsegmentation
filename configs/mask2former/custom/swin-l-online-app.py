@@ -1,16 +1,19 @@
 _base_ = '../mask2former_swin-l-in22k-384x384-pre_8xb2-160k_ade20k-640x640.py'
 
+# Image and crop settings
 crop_size = (1024, 1024)
 
+# Training pipeline
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', reduce_zero_label=False),
-    dict(type='Resize', scale=crop_size, keep_ratio=False),  
+    dict(type='Resize', scale=crop_size, keep_ratio=False),
     dict(type='RandomFlip', prob=0.5),
     dict(type='PhotoMetricDistortion'),
     dict(type='PackSegInputs')
 ]
 
+# Test pipeline
 test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='Resize', scale=crop_size, keep_ratio=False),
@@ -18,33 +21,26 @@ test_pipeline = [
     dict(type='PackSegInputs')
 ]
 
+# Data preprocessor
 data_preprocessor = dict(size=crop_size)
 
-data_root = '/root/data'
-train_img_path = 'images/train/images/training'
-train_seg_map_path = 'images/train/annotations/training'
-val_img_path='images/val/images/validation'
-val_seg_map_path='images/val/annotations/validation'
-
-
+# Paths (will be overridden in main.py)
+data_root = ''
 classes = None
 num_classes = None
 metainfo = None
 
-data_preprocessor = dict()#size=crop_size)
-
+# Model configuration
 model = dict(
     data_preprocessor=data_preprocessor,
     backbone=dict(init_cfg=None),
-    decode_head=dict(
-        num_classes=num_classes,
-        # loss_cls=dict(class_weight=[1.0] * num_classes + [0.1])
-    )
+    decode_head=dict(num_classes=num_classes)
 )
 
-# pretrained = None
-load_from = '/root/mmsegmentation/weights/mask2former_swin-l-in22k-384x384-pre_8xb2-160k_ade20k-640x640_20221203_235933-7120c214.pth'
+# Pretrained weights from Docker image
+load_from = '/weights/mask2former_swin-l-in22k-384x384-pre_8xb2-160k_ade20k-640x640_20221203_235933-7120c214.pth'
 
+# Dataset configuration
 train_dataloader = dict(
     batch_size=2,
     persistent_workers=False,
@@ -55,20 +51,19 @@ train_dataloader = dict(
         type='OnlineTrainingDataset',
         data_root=data_root,
         metainfo=metainfo,
-        data_prefix=dict(
-            img_path=train_img_path,
-            seg_map_path=train_seg_map_path
-        ),
+        data_prefix=dict(img_path='', seg_map_path=''),
         pipeline=train_pipeline,
         reduce_zero_label=False
     )
 )
 
+# Disable validation and testing
 val_dataloader = None
 test_dataloader = None
 val_evaluator = None
 test_evaluator = None
 
+# Optimizer
 optim_wrapper = dict(
     _delete_=True,
     type='OptimWrapper',
@@ -76,15 +71,16 @@ optim_wrapper = dict(
     clip_grad=dict(max_norm=0.1, norm_type=2)
 )
 
-max_epochs = 100000
+# Training schedule
+max_iters = 100000
 param_scheduler = [
     dict(type='LinearLR', start_factor=1e-3, by_epoch=False, begin=0, end=200),
 ]
-
-train_cfg = dict(type='IterBasedTrainLoop', max_iters=max_epochs, val_interval=10)
+train_cfg = dict(type='IterBasedTrainLoop', max_iters=max_iters, val_interval=10)
 val_cfg = None
 test_cfg = None
 
+# Hooks
 default_hooks = dict(
     timer=dict(type='IterTimerHook'),
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=200, max_keep_ckpts=5, save_best='auto'),
@@ -93,6 +89,7 @@ default_hooks = dict(
     sampler_seed=dict(type='DistSamplerSeedHook')
 )
 
+# Visualization
 vis_backends = [
     dict(type='LocalVisBackend'),
     dict(type='TensorboardVisBackend'),
@@ -100,4 +97,5 @@ vis_backends = [
 visualizer = dict(
     type='SegLocalVisualizer',
     vis_backends=vis_backends,
-    name='visualizer')
+    name='visualizer'
+)
