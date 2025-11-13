@@ -97,4 +97,5 @@ def predictions_to_sly_figures(
             )
             objects.append(label.to_json())
     
+
     return objects

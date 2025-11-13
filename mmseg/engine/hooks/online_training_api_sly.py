@@ -20,8 +20,6 @@ from mmseg.online_training.inference_utils import get_test_pipeline, predictions
 import supervisely as sly
 from supervisely import logger
 
-TARGET_HEIGHT = 1024
-
 @HOOKS.register_module()
 class OnlineTrainingAPISly(Hook):
     
@@ -207,10 +205,7 @@ class OnlineTrainingAPISly(Hook):
             )
         image_np = np.array(request_data['image'])              
         orig_h, orig_w = image_np.shape[:2]
-        scale = TARGET_HEIGHT / orig_h
-        target_w = int(orig_w * scale)
         
-        image_np_resized = cv2.resize(image_np, (target_w, TARGET_HEIGHT))
         
         image_np = np.array(request_data['image'])
         original_shape = image_np.shape[:2] 
@@ -221,7 +216,7 @@ class OnlineTrainingAPISly(Hook):
         model.eval()
         
         try:
-            result = inference_model(model, image_np_resized)
+            result = inference_model(model, image_np)
             
             objects = predictions_to_sly_figures(
                 result,
@@ -252,16 +247,9 @@ class OnlineTrainingAPISly(Hook):
         self.img_ids_set.add(img_id)
 
         orig_h, orig_w = image_np.shape[:2]
-        scale = TARGET_HEIGHT / orig_h
-        target_w = int(orig_w * scale)
-
-        # Resize image
-        image_np_resized = cv2.resize(image_np, (target_w, TARGET_HEIGHT))
     
-        # Save resized image
-        image = Image.fromarray(image_np_resized).convert('RGB')
+        image = Image.fromarray(image_np).convert('RGB')
 
-        # image = Image.fromarray(image_np).convert('RGB')
         image_path = self.images_dir / filename
         image.save(image_path)
         
@@ -273,12 +261,15 @@ class OnlineTrainingAPISly(Hook):
         }
 
         mask = sly_to_mask(ann, (width, height), self.class2idx)
+        mask = cv2.resize(mask, (target_w, TARGET_HEIGHT), interpolation=cv2.INTER_NEAREST)
         mask = validate_mask(mask, img_info, len(self.classes) + 1)
         
         mask_filename = Path(filename).stem + '.png'
         mask_path = self.masks_dir / mask_filename
+
+        mask = mask.astype(np.uint8)
         cv2.imwrite(str(mask_path), mask)
-        
+                
         sample_idx = dataset.add_sample(img_info, str(mask_path))
         
         print(

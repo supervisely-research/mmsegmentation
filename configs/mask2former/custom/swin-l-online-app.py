@@ -14,7 +14,7 @@ train_pipeline = [
 
 test_pipeline = [
     dict(type='LoadImageFromFile'),
-    dict(type='Resize', scale=(2560, 512), keep_ratio=True),
+    # dict(type='Resize', scale=(2560, 512), keep_ratio=True),
     dict(type='LoadAnnotations', reduce_zero_label=False),
     dict(type='PackSegInputs')
 ]
@@ -26,8 +26,8 @@ val_img_path='images/val/images/validation'
 val_seg_map_path='images/val/annotations/validation'
 
 
-classes = ['Background', 'Columella', 'Core', 'Locule', 'Navel', 'Pericarp', 'Placenta', 'Septum', 'Tomato', 'Sepal']
-num_classes = len(classes)
+classes = None
+num_classes = None
 metainfo = None
 
 data_preprocessor = dict()#size=crop_size)
@@ -37,12 +37,12 @@ model = dict(
     backbone=dict(init_cfg=None),
     decode_head=dict(
         num_classes=num_classes,
-        loss_cls=dict(class_weight=[1.0] * num_classes + [0.1])
+        # loss_cls=dict(class_weight=[1.0] * num_classes + [0.1])
     )
 )
 
 # pretrained = None
-# load_from = '/weights/mask2former_swin-l-in22k-384x384-pre_8xb2-160k_ade20k-640x640_20221203_235933-7120c214.pth'
+load_from = '/root/mmsegmentation/weights/mask2former_swin-l-in22k-384x384-pre_8xb2-160k_ade20k-640x640_20221203_235933-7120c214.pth'
 
 train_dataloader = dict(
     batch_size=2,

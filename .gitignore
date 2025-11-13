@@ -116,6 +116,7 @@ data
 work_dirs/
 mmseg/.mim
 *.gz
+*.txt.gz
 
 *.pth
 *.png
